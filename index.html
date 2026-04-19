@@ -1,0 +1,488 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><meta property="og:type" content="website"/>
+<meta property="og:title" content="Notion Code Preview"/>
+<meta property="og:description" content="Built with Notion Code Previewer"/>
+<meta property="og:image" content="https://9hiro9.github.io/notion-preview-9d96df46/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://9hiro9.github.io/notion-preview-9d96df46/og-image.png"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'6'%20fill%3D'%25236366f1'%2F%3E%3Ctext%20x%3D'16'%20y%3D'22'%20text-anchor%3D'middle'%20font-size%3D'18'%20fill%3D'white'%20font-family%3D'sans-serif'%3EN%3C%2Ftext%3E%3C%2Fsvg%3E"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --border: #eceef2;
+  --border-strong: #dde0e6;
+  --text: #1a1d24;
+  --muted: #6b7280;
+  --primary: #2383e2;
+  --primary-hover: #1a6ec4;
+  --primary-soft: #eaf3fd;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warn: #d97706;
+  --warn-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --gray-soft: #f1f3f5;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.06);
+  --shadow-md: 0 4px 12px rgba(16,24,40,.08);
+  --shadow-lg: 0 12px 32px rgba(16,24,40,.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+button { cursor: pointer; }
+
+/* Layout */
+.app { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px; }
+.brand-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, #2383e2, #7c5cff);
+  color: #fff; border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 18px;
+}
+.brand-title { font-weight: 700; font-size: 15px; }
+.brand-sub { font-size: 12px; color: var(--muted); }
+
+.nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  background: transparent; border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+  transition: all .15s;
+}
+.nav-item span:first-child { font-size: 16px; }
+.nav-item:hover { background: var(--gray-soft); color: var(--text); }
+.nav-item.active { background: var(--primary-soft); color: var(--primary); }
+.nav-badge {
+  margin-left: auto;
+  background: var(--danger); color: #fff;
+  font-size: 11px; font-weight: 600;
+  padding: 1px 7px; border-radius: 10px;
+  min-width: 18px; text-align: center;
+}
+.nav-item.active .nav-badge { background: var(--primary); }
+
+.sidebar-footer { border-top: 1px solid var(--border); padding-top: 16px; }
+.user-chip { display: flex; align-items: center; gap: 10px; padding: 4px 8px; }
+.u-name { font-weight: 600; font-size: 13px; }
+.u-role { font-size: 11px; color: var(--muted); }
+
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center;
+  color: #fff; font-weight: 600; font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Main */
+.main { flex: 1; padding: 28px 32px; max-width: 100%; overflow-x: hidden; }
+.topbar {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+.topbar h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.topbar-actions { display: flex; gap: 8px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.ok { color: var(--success); }
+.warn { color: var(--warn); }
+
+/* Buttons */
+.btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+  transition: all .15s;
+}
+.btn:hover { background: var(--gray-soft); }
+.btn.primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn.danger { color: var(--danger); }
+.btn.danger:hover { background: var(--danger-soft); }
+.btn.small { padding: 6px 10px; font-size: 12px; }
+.btn.ghost { border: none; background: transparent; }
+.icon-btn {
+  width: 32px; height: 32px; display: grid; place-items: center;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: 13px;
+}
+.icon-btn:hover { background: var(--gray-soft); }
+
+/* Tabs */
+.tab-panel { display: none; animation: fadeIn .2s ease; }
+.tab-panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-head h3 { font-size: 15px; font-weight: 600; }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+}
+.stat-card.clickable { cursor: pointer; }
+.stat-card.clickable:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-soft); }
+.data-table tbody tr.clickable { cursor: pointer; }
+.calendar .day .event { cursor: pointer; }
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 4px; }
+.stat-foot { font-size: 11px; }
+
+.grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+/* Table */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th, .data-table td { padding: 12px 20px; text-align: left; border-bottom: 1px solid var(--border); }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table th { background: #fafbfc; font-weight: 600; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+.data-table tbody tr { transition: background .1s; }
+.data-table tbody tr:hover { background: #fafbfc; }
+.data-table .cell-actions { text-align: right; white-space: nowrap; }
+.data-table .cell-actions button { margin-left: 4px; }
+.data-table .empty { text-align: center; color: var(--muted); padding: 40px 20px; }
+
+.user-cell { display: flex; align-items: center; gap: 10px; }
+.user-cell .avatar { width: 28px; height: 28px; font-size: 11px; }
+.user-cell .name { font-weight: 500; }
+
+/* Badges */
+.badge { padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+.badge.신청 { background: var(--warn-soft); color: var(--warn); }
+.badge.승인완료 { background: var(--success-soft); color: var(--success); }
+.badge.반려 { background: var(--danger-soft); color: var(--danger); }
+.badge.취소 { background: var(--gray-soft); color: var(--muted); }
+.badge-soft { background: var(--gray-soft); color: var(--muted); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+
+/* Progress bar */
+.progress { height: 6px; background: var(--gray-soft); border-radius: 3px; overflow: hidden; min-width: 100px; }
+.progress-bar { height: 100%; background: var(--primary); border-radius: 3px; transition: width .3s; }
+.progress-bar.warn { background: var(--warn); }
+.progress-bar.danger { background: var(--danger); }
+
+/* Filter */
+.filter-row { display: flex; gap: 8px; align-items: center; }
+.filter-row input, .filter-row select {
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  min-width: 160px;
+}
+.filter-row input:focus, .filter-row select:focus { outline: 2px solid var(--primary-soft); border-color: var(--primary); }
+
+/* Department chart */
+.dept-chart { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+.dept-row { display: grid; grid-template-columns: 80px 1fr 60px; align-items: center; gap: 10px; font-size: 12px; }
+.dept-row .dept-name { font-weight: 500; }
+.dept-row .dept-value { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Calendar */
+.cal-head { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.cal-head h2 { font-size: 17px; font-weight: 600; min-width: 140px; text-align: center; }
+.calendar { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--border); gap: 1px; padding: 1px; }
+.calendar .day-header { background: #fafbfc; padding: 10px; text-align: center; font-weight: 600; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.calendar .day { background: var(--surface); min-height: 110px; padding: 8px; position: relative; display: flex; flex-direction: column; gap: 3px; }
+.calendar .day.other-month { background: #fafbfc; }
+.calendar .day.other-month .date { color: #c7c7c4; }
+.calendar .day.today .date {
+  background: var(--primary); color: #fff;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 700;
+}
+.calendar .day .date { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+.calendar .day .event {
+  font-size: 11px; padding: 2px 6px; border-radius: 4px;
+  color: #fff; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer;
+  transition: transform .1s;
+}
+.calendar .day .event:hover { transform: translateX(2px); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+
+/* Modal */
+.modal {
+  position: fixed; inset: 0;
+  background: rgba(16,24,40,.5); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  animation: modalIn .15s ease;
+}
+.modal.hidden { display: none; }
+@keyframes modalIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content {
+  background: var(--surface);
+  border-radius: var(--radius);
+  width: 480px; max-width: 92vw; max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modalSlide .2s ease;
+}
+@keyframes modalSlide { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.modal-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+.modal-head h3 { font-size: 16px; font-weight: 600; }
+.modal-content form { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.modal-content label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); font-weight: 500; }
+.modal-content input, .modal-content select, .modal-content textarea {
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+}
+.modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus {
+  outline: 2px solid var(--primary-soft); border-color: var(--primary);
+}
+.modal-content textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--border); background: #fafbfc; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: #fff;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .2s ease;
+  z-index: 200;
+}
+.toast.hidden { display: none; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>if(window.Babel)Babel.disableScriptTags=true;</script>
+</head><body><!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vacation Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">🏖️</div>
+        <div>
+          <div class="brand-title">Vacation</div>
+          <div class="brand-sub">Manager</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-tab="dashboard"><span>📊</span>대시보드</button>
+        <button class="nav-item" data-tab="calendar"><span>📅</span>팀 캘린더</button>
+        <button class="nav-item" data-tab="pending"><span>⏳</span>승인 대기 <span class="nav-badge" id="pendingBadge">0</span></button>
+        <button class="nav-item" data-tab="requests"><span>📋</span>전체 신청</button>
+        <button class="nav-item" data-tab="employees"><span>👥</span>직원</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar" style="background:#2383e2">관</div>
+          <div>
+            <div class="u-name">관리자</div>
+            <div class="u-role">Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">대시보드</h1>
+          <p id="pageSub" class="muted">한눈에 보는 팀 휴가 현황</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="exportBtn">⬇ Export</button>
+          <button class="btn primary" id="newRequestBtn">＋ 새 신청</button>
+        </div>
+      </header>
+
+      <!-- Dashboard -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="stats">
+          <div class="stat-card clickable" data-nav="employees">
+            <div class="stat-label">총 직원</div>
+            <div class="stat-value" id="statEmp">0</div>
+            <div class="stat-foot muted">active members →</div>
+          </div>
+          <div class="stat-card clickable" data-nav="pending">
+            <div class="stat-label">승인 대기</div>
+            <div class="stat-value" id="statPending">0</div>
+            <div class="stat-foot warn">action needed →</div>
+          </div>
+          <div class="stat-card clickable" data-nav="calendar">
+            <div class="stat-label">이번달 휴가</div>
+            <div class="stat-value" id="statMonth">0</div>
+            <div class="stat-foot muted">approved days →</div>
+          </div>
+          <div class="stat-card clickable" data-nav="employees">
+            <div class="stat-label">평균 잔여 연차</div>
+            <div class="stat-value" id="statAvg">0</div>
+            <div class="stat-foot ok">days/person →</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><h3>최근 신청</h3><span class="muted small">최신 5건</span></div>
+            <table class="data-table" id="recentTable"></table>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>부서별 사용 연차</h3></div>
+            <div id="deptChart" class="dept-chart"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calendar -->
+      <section id="tab-calendar" class="tab-panel">
+        <div class="card">
+          <div class="cal-head">
+            <button class="icon-btn" id="prevMonth">◀</button>
+            <h2 id="calTitle"></h2>
+            <button class="icon-btn" id="nextMonth">▶</button>
+            <button class="btn small" id="todayBtn" style="margin-left:auto">오늘</button>
+          </div>
+          <div id="calendar" class="calendar"></div>
+          <div class="legend" id="calLegend"></div>
+        </div>
+      </section>
+
+      <!-- Pending -->
+      <section id="tab-pending" class="tab-panel">
+        <div class="card">
+          <div class="card-head"><h3>승인 대기</h3></div>
+          <table id="pendingTable" class="data-table"></table>
+        </div>
+      </section>
+
+      <!-- Requests -->
+      <section id="tab-requests" class="tab-panel">
+        <div class="card">
+          <div class="card-head">
+            <h3>전체 휴가 신청</h3>
+            <div class="filter-row">
+              <input type="search" id="reqSearch" placeholder="🔍 이름/사유 검색..." />
+              <select id="reqStatusFilter">
+                <option value="">전체 상태</option>
+                <option>신청</option>
+                <option>승인완료</option>
+                <option>반려</option>
+                <option>취소</option>
+              </select>
+            </div>
+          </div>
+          <table id="requestsTable" class="data-table"></table>
+        </div>
+      </section>
+
+      <!-- Employees -->
+      <section id="tab-employees" class="tab-panel">
+        <div class="card">
+          <div class="card-head">
+            <h3>직원 현황</h3>
+            <div class="filter-row">
+              <input type="search" id="empSearch" placeholder="🔍 이름/부서 검색..." />
+              <button class="btn primary small" id="addEmployeeBtn">＋ 직원 추가</button>
+            </div>
+          </div>
+          <table id="employeesTable" class="data-table"></table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button class="icon-btn" id="modalClose">✕</button>
+      </div>
+      <form id="modalForm"></form>
+      <div class="modal-actions">
+        <button id="modalCancel" class="btn">취소</button>
+        <button id="modalSave" class="btn primary">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+</body>
+</html><script>
+var __stripPlugin=function(){return{visitor:{ImportDeclaration:function(path){var src=path.node.source.value;if(src.indexOf("./")===0||src.indexOf("../")===0)path.remove();},ExportDefaultDeclaration:function(path){var decl=path.node.declaration;if(decl.type==="FunctionDeclaration"||decl.type==="ClassDeclaration"){path.replaceWith(decl);}else{path.replaceWith({type:"VariableDeclaration",kind:"var",declarations:[{type:"VariableDeclarator",id:{type:"Identifier",name:"_default"},init:decl}]});}},ExportNamedDeclaration:function(path){if(path.node.declaration){path.replaceWith(path.node.declaration);}else{path.remove();}},ExportAllDeclaration:function(path){path.remove();}}};};
+var __dedupePlugin=function(){var _s={};return{visitor:{VariableDeclaration:function(p){if(p.parent.type!=="Program")return;if(p.node.kind!=="const"&&p.node.kind!=="let")return;var kept=[];for(var i=0;i<p.node.declarations.length;i++){var d=p.node.declarations[i];var n=d.id&&d.id.type==="Identifier"?d.id.name:null;if(n&&_s[n]){}else{if(n)_s[n]=true;kept.push(d);}}if(kept.length===0){p.remove();}else{p.node.declarations=kept;}}}}};
+var __code="/* ============== Storage ============== */\nconst STORE = { employees: 'vacation_employees', requests: 'vacation_requests' };\nconst load = (k) => JSON.parse(localStorage.getItem(k) || '[]');\nconst save = (k, v) => localStorage.setItem(k, JSON.stringify(v));\nconst uid = (p) => `${p}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;\n\n/* ============== Seed ============== */\nconst PALETTE = ['#2383e2', '#7c5cff', '#16a34a', '#d97706', '#dc2626', '#0ea5e9', '#db2777'];\nconst SEED_VERSION_KEY = 'vacation_seed_version';\nconst CURRENT_SEED_VERSION = '3';\nif (localStorage.getItem(SEED_VERSION_KEY) !== CURRENT_SEED_VERSION) {\n  save(STORE.employees, [\n    { id: 'emp_001', name: '김민수', department: '개발', position: '과장', hireDate: '2021-03-15', email: 'minsu.kim@company.com', annualLeave: 15, color: PALETTE[0] },\n    { id: 'emp_002', name: '이서연', department: '디자인', position: '대리', hireDate: '2022-07-01', email: 'seoyeon.lee@company.com', annualLeave: 15, color: PALETTE[1] },\n    { id: 'emp_003', name: '박준호', department: '개발', position: '차장', hireDate: '2019-11-04', email: 'junho.park@company.com', annualLeave: 17, color: PALETTE[2] },\n    { id: 'emp_004', name: '정예린', department: '마케팅', position: '대리', hireDate: '2023-05-22', email: 'yerin.jung@company.com', annualLeave: 15, color: PALETTE[3] },\n  ]);\n  save(STORE.requests, [\n    { id: 'req_001', employeeId: 'emp_001', type: '연차', startDate: '2026-04-20', endDate: '2026-04-22', days: 3, status: '승인완료', reason: '가족 여행', createdAt: new Date().toISOString() },\n    { id: 'req_002', employeeId: 'emp_002', type: '연차', startDate: '2026-04-27', endDate: '2026-04-28', days: 2, status: '신청', reason: '개인 사정', createdAt: new Date().toISOString() },\n    { id: 'req_003', employeeId: 'emp_003', type: '연차', startDate: '2026-05-04', endDate: '2026-05-08', days: 5, status: '승인완료', reason: '어린이날 연휴', createdAt: new Date().toISOString() },\n    { id: 'req_004', employeeId: 'emp_001', type: '반차(오후)', startDate: '2026-04-15', endDate: '2026-04-15', days: 0.5, status: '승인완료', reason: '병원 예약', createdAt: new Date().toISOString() },\n    { id: 'req_005', employeeId: 'emp_002', type: '반차(오전)', startDate: '2026-04-22', endDate: '2026-04-22', days: 0.5, status: '신청', reason: '은행 방문', createdAt: new Date().toISOString() },\n    { id: 'req_006', employeeId: 'emp_003', type: '반차(오후)', startDate: '2026-04-10', endDate: '2026-04-10', days: 0.5, status: '승인완료', reason: '학부모 상담', createdAt: new Date().toISOString() },\n    { id: 'req_007', employeeId: 'emp_004', type: '반차(오전)', startDate: '2026-04-17', endDate: '2026-04-17', days: 0.5, status: '승인완료', reason: '건강검진', createdAt: new Date().toISOString() },\n  ]);\n  save(SEED_VERSION_KEY.replace('vacation_', ''), CURRENT_SEED_VERSION);\n  localStorage.setItem(SEED_VERSION_KEY, CURRENT_SEED_VERSION);\n}\n\n/* ============== Helpers ============== */\nconst $ = (s, r = document) => r.querySelector(s);\nconst $$ = (s, r = document) => [...r.querySelectorAll(s)];\nconst initial = (name) => name ? name.slice(-2) : '?';\nconst diffDays = (start, end) => Math.round((new Date(end) - new Date(start)) / 86400000) + 1;\nconst calcDays = (type, s, e) => type.startsWith('반차') ? 0.5 : diffDays(s, e);\nconst fmtDate = (d) => d ? d.replace(/-/g, '.').slice(5) : '';\nconst fmtRange = (s, e) => s === e ? fmtDate(s) : `${fmtDate(s)} - ${fmtDate(e)}`;\nconst usedLeave = (empId) => load(STORE.requests).filter(r => r.employeeId === empId && r.status === '승인완료').reduce((s, r) => s + r.days, 0);\nconst findEmp = (id) => load(STORE.employees).find(e => e.id === id);\nfunction empName(id) { var e = findEmp(id); return (e && e.name) || '(삭제됨)'; }\nfunction empColor(id) { var e = findEmp(id); return (e && e.color) || '#9ca3af'; }\n\nfunction toast(msg) {\n  const el = $('#toast');\n  el.textContent = msg;\n  el.classList.remove('hidden');\n  clearTimeout(toast.t);\n  toast.t = setTimeout(() => el.classList.add('hidden'), 2200);\n}\n\n/* ============== Tabs ============== */\nconst TAB_META = {\n  dashboard: { title: '대시보드', sub: '한눈에 보는 팀 휴가 현황' },\n  calendar: { title: '팀 캘린더', sub: '승인완료된 휴가를 월별로 확인' },\n  pending: { title: '승인 대기', sub: '검토가 필요한 신청' },\n  requests: { title: '전체 신청', sub: '모든 휴가 신청 내역' },\n  employees: { title: '직원', sub: '팀 멤버 및 연차 현황' },\n};\n$$('.nav-item').forEach(btn => {\n  btn.addEventListener('click', () => {\n    $$('.nav-item').forEach(b => b.classList.remove('active'));\n    $$('.tab-panel').forEach(p => p.classList.remove('active'));\n    btn.classList.add('active');\n    const tab = btn.dataset.tab;\n    $(`#tab-${tab}`).classList.add('active');\n    $('#pageTitle').textContent = TAB_META[tab].title;\n    $('#pageSub').textContent = TAB_META[tab].sub;\n    renderAll();\n  });\n});\n\n/* ============== Avatar cell ============== */\nfunction avatar(emp) {\n  var color = (emp && emp.color) || '#9ca3af';\n  var name = (emp && emp.name) || '?';\n  return '<div class=\"avatar\" style=\"background:' + color + '\">' + initial(name) + '</div>';\n}\nfunction userCell(id) {\n  var e = findEmp(id);\n  var name = (e && e.name) || '(삭제됨)';\n  var dept = (e && e.department) || '';\n  return '<div class=\"user-cell\">' + avatar(e) + '<div><div class=\"name\">' + name + '</div><div class=\"muted small\">' + dept + '</div></div></div>';\n}\n\n/* ============== Dashboard ============== */\nfunction renderDashboard() {\n  const emps = load(STORE.employees);\n  const reqs = load(STORE.requests);\n  const now = new Date();\n  const thisMonth = reqs.filter(r => r.status === '승인완료' && r.startDate.startsWith(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`));\n  const pending = reqs.filter(r => r.status === '신청');\n\n  $('#statEmp').textContent = emps.length;\n  $('#statPending').textContent = pending.length;\n  $('#pendingBadge').textContent = pending.length;\n  $('#pendingBadge').style.display = pending.length ? 'inline-block' : 'none';\n  $('#statMonth').textContent = thisMonth.reduce((s, r) => s + r.days, 0);\n  const avg = emps.length ? (emps.reduce((s, e) => s + (e.annualLeave - usedLeave(e.id)), 0) / emps.length) : 0;\n  $('#statAvg').textContent = avg.toFixed(1);\n\n  // Recent 5\n  const recent = [...reqs].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).slice(0, 5);\n  $('#recentTable').innerHTML = `<thead><tr><th>신청자</th><th>기간</th><th>상태</th></tr></thead><tbody>${\n    recent.map(r => `<tr class=\"clickable\" onclick=\"editRequest('${r.id}')\"><td>${userCell(r.employeeId)}</td><td>${fmtRange(r.startDate, r.endDate)} <span class=\"badge-soft\">${r.days}일</span></td><td><span class=\"badge ${r.status}\">${r.status}</span></td></tr>`).join('') || '<tr><td colspan=\"3\" class=\"empty\">데이터 없음</td></tr>'\n  }</tbody>`;\n\n  // Dept chart\n  const deptMap = {};\n  emps.forEach(e => {\n    if (!deptMap[e.department]) deptMap[e.department] = { used: 0, total: 0 };\n    deptMap[e.department].used += usedLeave(e.id);\n    deptMap[e.department].total += e.annualLeave;\n  });\n  const maxTotal = Math.max(1, ...Object.values(deptMap).map(d => d.total));\n  $('#deptChart').innerHTML = Object.entries(deptMap).map(([name, d]) => {\n    const pct = d.total ? (d.used / d.total) * 100 : 0;\n    const cls = pct > 70 ? 'danger' : pct > 40 ? 'warn' : '';\n    return `<div class=\"dept-row\"><div class=\"dept-name\">${name}</div><div class=\"progress\"><div class=\"progress-bar ${cls}\" style=\"width:${Math.min(100, (d.used / maxTotal) * 100)}%\"></div></div><div class=\"dept-value\">${d.used}/${d.total}</div></div>`;\n  }).join('') || '<div class=\"muted small\">데이터 없음</div>';\n}\n\n/* ============== Employees ============== */\nfunction renderEmployees() {\n  var empSearch = $('#empSearch');\n  const q = (empSearch && empSearch.value.toLowerCase()) || '';\n  const emps = load(STORE.employees).filter(e => !q || e.name.toLowerCase().includes(q) || e.department.toLowerCase().includes(q));\n  $('#employeesTable').innerHTML = `<thead><tr><th>이름</th><th>직급</th><th>입사일</th><th>연차 사용</th><th></th></tr></thead><tbody>${\n    emps.map(e => {\n      const used = usedLeave(e.id);\n      const remain = e.annualLeave - used;\n      const pct = e.annualLeave ? (used / e.annualLeave) * 100 : 0;\n      const cls = pct > 80 ? 'danger' : pct > 50 ? 'warn' : '';\n            return `<tr class=\"clickable\" onclick=\"editEmployee('${e.id}')\"><br>        <td>${userCell(e.id)}</td><br>        <td>${e.position}</td><br>        <td>${e.hireDate}</td><br>        <td><div style=\"display:flex;align-items:center;gap:10px\"><div class=\"progress\"><div class=\"progress-bar ${cls}\" style=\"width:${pct}%\"></div></div><span class=\"muted small\">${used}/${e.annualLeave} · 잔여 ${remain}</span></div></td><br>        <td class=\"cell-actions\" onclick=\"event.stopPropagation()\"><button class=\"btn small\" onclick=\"editEmployee('${e.id}')\">수정</button><button class=\"btn small danger\" onclick=\"deleteEmployee('${e.id}')\">삭제</button></td><br>      </tr>`;\n    }).join('') || '<tr><td colspan=\"5\" class=\"empty\">직원이 없습니다</td></tr>'\n  }</tbody>`;\n}\n\n/* ============== Requests ============== */\nfunction renderRequestsTable(tableId, filterFn, withActions) {\n  const reqs = load(STORE.requests).filter(filterFn).sort((a, b) => b.startDate.localeCompare(a.startDate));\n  $(`#${tableId}`).innerHTML = `<thead><tr><th>신청자</th><th>종류</th><th>기간</th><th>일수</th><th>상태</th><th>사유</th><th></th></tr></thead><tbody>${\n        reqs.map(r => `<tr class=\"clickable\" onclick=\"editRequest('${r.id}')\"><br>      <td>${userCell(r.employeeId)}</td><br>      <td>${r.type}</td><br>      <td>${fmtRange(r.startDate, r.endDate)}</td><br>      <td>${r.days}</td><br>      <td><span class=\"badge ${r.status}\">${r.status}</span></td><br>      <td class=\"muted\">${r.reason || '-'}</td><br>      <td class=\"cell-actions\" onclick=\"event.stopPropagation()\">${withActions(r)}</td><br>    </tr>`).join('') || '<tr><td colspan=\"7\" class=\"empty\">신청 내역이 없습니다</td></tr>'\n  }</tbody>`;\n}\nfunction renderPending() {\n  renderRequestsTable('pendingTable', r => r.status === '신청',\n    r => `<button class=\"btn small primary\" onclick=\"setStatus('${r.id}','승인완료')\">승인</button><button class=\"btn small danger\" onclick=\"setStatus('${r.id}','반려')\">반려</button>`);\n}\nfunction renderRequests() {\n  var reqSearch = $('#reqSearch');\n  var reqStatusFilter = $('#reqStatusFilter');\n  const q = (reqSearch && reqSearch.value.toLowerCase()) || '';\n  const status = (reqStatusFilter && reqStatusFilter.value) || '';\n  renderRequestsTable('requestsTable',\n    r => (!status || r.status === status) && (!q || empName(r.employeeId).toLowerCase().includes(q) || (r.reason || '').toLowerCase().includes(q)),\n    r => `<button class=\"btn small\" onclick=\"editRequest('${r.id}')\">수정</button><button class=\"btn small danger\" onclick=\"deleteRequest('${r.id}')\">삭제</button>`);\n}\n\n/* ============== Calendar ============== */\nlet calCursor = new Date();\nfunction renderCalendar() {\n  const y = calCursor.getFullYear(), m = calCursor.getMonth();\n  $('#calTitle').textContent = `${y}년 ${m + 1}월`;\n  const first = new Date(y, m, 1);\n  const startDay = first.getDay();\n  const daysInMonth = new Date(y, m + 1, 0).getDate();\n  const prevDays = new Date(y, m, 0).getDate();\n  const approved = load(STORE.requests).filter(r => r.status === '승인완료');\n  const today = new Date();\n  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;\n  const days = ['일', '월', '화', '수', '목', '금', '토'];\n  let html = days.map(d => `<div class=\"day-header\">${d}</div>`).join('');\n  for (let i = startDay - 1; i >= 0; i--) html += `<div class=\"day other-month\"><div class=\"date\">${prevDays - i}</div></div>`;\n  for (let d = 1; d <= daysInMonth; d++) {\n    const date = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;\n    const events = approved.filter(r => date >= r.startDate && date <= r.endDate);\n    const isToday = date === todayStr;\n    html += `<div class=\"day${isToday ? ' today' : ''}\"><div class=\"date\">${d}</div>${events.map(e => `<div class=\"event\" style=\"background:${empColor(e.employeeId)}\" onclick=\"editRequest('${e.id}')\" title=\"${empName(e.employeeId)} · ${e.type} · ${fmtRange(e.startDate, e.endDate)}\">${empName(e.employeeId)} ${e.type.startsWith('반차') ? '½' : ''}</div>`).join('')}</div>`;\n  }\n  const totalCells = startDay + daysInMonth;\n  const trailing = (7 - (totalCells % 7)) % 7;\n  for (let i = 1; i <= trailing; i++) html += `<div class=\"day other-month\"><div class=\"date\">${i}</div></div>`;\n  $('#calendar').innerHTML = html;\n\n  // Legend\n  const emps = load(STORE.employees);\n  $('#calLegend').innerHTML = emps.map(e => `<div class=\"legend-item\"><div class=\"legend-swatch\" style=\"background:${e.color}\"></div>${e.name}</div>`).join('');\n}\n$('#prevMonth').onclick = () => { calCursor.setMonth(calCursor.getMonth() - 1); renderCalendar(); };\n$('#nextMonth').onclick = () => { calCursor.setMonth(calCursor.getMonth() + 1); renderCalendar(); };\n$('#todayBtn').onclick = () => { calCursor = new Date(); renderCalendar(); };\n\n/* ============== Modal ============== */\nconst modal = $('#modal');\nconst modalForm = $('#modalForm');\nlet saveHandler = null;\nfunction openModal(title, html, onSave) {\n  $('#modalTitle').textContent = title;\n  modalForm.innerHTML = html;\n  saveHandler = onSave;\n  modal.classList.remove('hidden');\n}\nfunction closeModal() { modal.classList.add('hidden'); }\n$('#modalCancel').onclick = closeModal;\n$('#modalClose').onclick = closeModal;\n$('#modalSave').onclick = () => { if (saveHandler && saveHandler()) { closeModal(); renderAll(); } };\nmodal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });\n\n/* ============== CRUD: Employee ============== */\nwindow.editEmployee = (id) => {\n  const e = (id && findEmp(id)) || {};\n  const isNew = !id;\n  const opts = (arr, val) => arr.map(x => `<option ${x === val ? 'selected' : ''}>${x}</option>`).join('');\n  openModal(isNew ? '직원 추가' : '직원 수정', `\n    <label>이름<input name=\"name\" value=\"${e.name || ''}\" required /></label>\n    <div class=\"form-row\">\n      <label>부서<select name=\"department\">${opts(['개발','디자인','운영','마케팅','경영'], e.department)}</select></label>\n      <label>직급<select name=\"position\">${opts(['사원','대리','과장','차장','부장'], e.position)}</select></label>\n    </div>\n    <div class=\"form-row\">\n      <label>입사일<input type=\"date\" name=\"hireDate\" value=\"${e.hireDate || ''}\" required /></label>\n      <label>연간 부여 연차<input type=\"number\" name=\"annualLeave\" value=\"${e.annualLeave ?? 15}\" required /></label>\n    </div>\n    <label>이메일<input type=\"email\" name=\"email\" value=\"${e.email || ''}\" /></label>\n  `, () => {\n    const data = Object.fromEntries(new FormData(modalForm));\n    data.annualLeave = Number(data.annualLeave);\n    const list = load(STORE.employees);\n    if (isNew) list.push({ id: uid('emp'), color: PALETTE[list.length % PALETTE.length], ...data });\n    else Object.assign(list.find(x => x.id === id), data);\n    save(STORE.employees, list);\n    toast(isNew ? '직원이 추가됐어요' : '수정됐어요');\n    return true;\n  });\n};\nwindow.deleteEmployee = (id) => {\n  if (!confirm('이 직원을 삭제할까요?')) return;\n  save(STORE.employees, load(STORE.employees).filter(e => e.id !== id));\n  toast('삭제됐어요'); renderAll();\n};\n$('#addEmployeeBtn').onclick = () => window.editEmployee();\n\n/* ============== CRUD: Request ============== */\nwindow.editRequest = (id) => {\n  const r = (id && load(STORE.requests).find(x => x.id === id)) || { status: '신청' };\n  const isNew = !id;\n  const emps = load(STORE.employees);\n  const opts = (arr, val) => arr.map(x => `<option ${x === val ? 'selected' : ''}>${x}</option>`).join('');\n  openModal(isNew ? '새 휴가 신청' : '신청 수정', `\n    <label>신청자<select name=\"employeeId\" required>${emps.map(e => `<option value=\"${e.id}\" ${r.employeeId===e.id?'selected':''}>${e.name} · ${e.department}</option>`).join('')}</select></label>\n    <div class=\"form-row\">\n      <label>휴가 종류<select name=\"type\">${opts(['연차','반차(오전)','반차(오후)','병가','경조사','무급'], r.type)}</select></label>\n      <label>상태<select name=\"status\">${opts(['신청','승인완료','반려','취소'], r.status)}</select></label>\n    </div>\n    <div class=\"form-row\">\n      <label>시작일<input type=\"date\" name=\"startDate\" value=\"${r.startDate || ''}\" required /></label>\n      <label>종료일<input type=\"date\" name=\"endDate\" value=\"${r.endDate || ''}\" required /></label>\n    </div>\n    <label>사유<textarea name=\"reason\" placeholder=\"간단한 사유\">${r.reason || ''}</textarea></label>\n  `, () => {\n    const data = Object.fromEntries(new FormData(modalForm));\n    if (data.endDate < data.startDate) { alert('종료일이 시작일보다 빠를 수 없어요.'); return false; }\n    data.days = calcDays(data.type, data.startDate, data.endDate);\n    const list = load(STORE.requests);\n    if (isNew) list.push({ id: uid('req'), createdAt: new Date().toISOString(), ...data });\n    else Object.assign(list.find(x => x.id === id), data);\n    save(STORE.requests, list);\n    toast(isNew ? '신청이 등록됐어요' : '수정됐어요');\n    return true;\n  });\n};\nwindow.deleteRequest = (id) => {\n  if (!confirm('이 신청을 삭제할까요?')) return;\n  save(STORE.requests, load(STORE.requests).filter(r => r.id !== id));\n  toast('삭제됐어요'); renderAll();\n};\nwindow.setStatus = (id, status) => {\n  const list = load(STORE.requests);\n  const r = list.find(x => x.id === id);\n  if (r) { r.status = status; save(STORE.requests, list); toast(`${status} 처리됐어요`); renderAll(); }\n};\n$('#newRequestBtn').onclick = () => window.editRequest();\n\n/* ============== Stat card nav ============== */\n$$('.stat-card.clickable').forEach(card => {\n  card.addEventListener('click', () => {\n    var target = card.dataset.nav;\n    var btn = document.querySelector('.nav-item[data-tab=\"' + target + '\"]');\n    if (btn) btn.click();\n  });\n});\n\n/* ============== Search & filter ============== */\nvar _empSearch = $('#empSearch');\nif (_empSearch) _empSearch.addEventListener('input', renderEmployees);\nvar _reqSearch = $('#reqSearch');\nif (_reqSearch) _reqSearch.addEventListener('input', renderRequests);\nvar _reqStatusFilter = $('#reqStatusFilter');\nif (_reqStatusFilter) _reqStatusFilter.addEventListener('change', renderRequests);\n\n/* ============== Export ============== */\n$('#exportBtn').onclick = () => {\n  const data = { employees: load(STORE.employees), requests: load(STORE.requests), exportedAt: new Date().toISOString() };\n  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement('a');\n  a.href = url; a.download = `vacation-backup-${Date.now()}.json`; a.click();\n  URL.revokeObjectURL(url);\n  toast('백업이 내려받아졌어요');\n};\n\n/* ============== Render all ============== */\nfunction renderAll() {\n  renderDashboard();\n  renderEmployees();\n  renderRequests();\n  renderPending();\n  renderCalendar();\n}\nrenderAll();";
+var __result=Babel.transform(__code,{filename:"app.ts",presets:["typescript"],plugins:[__stripPlugin,__dedupePlugin,__jsxDecodePlugin],generatorOpts:{jsescOption:{minimal:true}}});
+eval(__result.code);
+</script>
+</body></html>
