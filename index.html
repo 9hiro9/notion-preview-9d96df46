@@ -322,6 +322,20 @@ button { cursor: pointer; }
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    // JSX decoder polyfill — srcdoc에서 가장 먼저 실행되어 전역을 선점
+    (function(){
+      function id(x){ return x; }
+      var handler = {
+        get: function(t, p){ return (p in t) ? t[p] : id; },
+        apply: function(t, a, args){ return args[0]; }
+      };
+      var proxy;
+      try { proxy = new Proxy(id, handler); } catch(e){ proxy = id; }
+      window.__jsxDecodePlugin = proxy;
+      try { Object.defineProperty(window, '__jsxDecodePlugin', { value: proxy, writable: true, configurable: true }); } catch(e){}
+    })();
+  </script>
 </head>
 <body>
   <div class="app">
